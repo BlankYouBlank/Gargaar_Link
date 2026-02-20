@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Gargaar-Link</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        /* New WhatsApp Button Styling */
+        .btn-whatsapp {
+            background-color: #25D366;
+            color: white;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-whatsapp:hover {
+            background-color: #128C7E;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Adjusting layout for multiple buttons */
+        .dashboard-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="no-print">
+            <div class="header-top">
+                <h1>Gargaar-Link 🇸🇴</h1>
+                <div class="header-actions">
+                    <button id="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+                    <button onclick="window.print()" class="btn-download">🖨️ Print Report</button>
+                    <button onclick="logout()" class="btn-logout">Logout</button>
+                </div>
+            </div>
+            <p>National Rural Health Supply Command Center</p>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card"><h3>Total Records</h3><p id="stat-total">0</p></div>
+            <div class="stat-card critical-stat"><h3>Critical</h3><p id="stat-critical">0</p></div>
+            <div class="stat-card stable-stat"><h3>Stable</h3><p id="stat-stable">0</p></div>
+            <div class="stat-card"><h3>Coverage</h3><p id="stat-coverage">0%</p></div>
+        </div>
+
+        <div class="main-layout">
+            <div class="card sidebar no-print">
+                <h3>Update Stock</h3>
+                <input type="text" id="village" placeholder="Village (e.g. Sheikh)">
+                <input type="number" step="any" id="lat" placeholder="Latitude">
+                <input type="number" step="any" id="lng" placeholder="Longitude">
+                <select id="item">
+                    <option value="Oxygen Tanks">Oxygen Tanks (Min: 5)</option>
+                    <option value="Malaria Kits">Malaria Kits (Min: 50)</option>
+                    <option value="Antibiotics">Antibiotics (Min: 20)</option>
+                    <option value="IV Fluids">IV Fluids (Min: 15)</option>
+                    <option value="Clean Delivery Kits">Clean Delivery Kits (Min: 15)</option>
+                    <option value="Oxytocin Ampoules">Oxytocin Ampoules (Min: 10)</option>
+                    <option value="Malaria RDT Kits">Malaria RDT Kits (Min: 100)</option>
+                    <option value="HIV Test Strips">HIV Test Strips (Min: 30)</option>
+                    <option value="BCG Vaccine (TB)">BCG Vaccine (TB) (Min: 20)</option>
+                    <option value="Polio (nOPV2)">Polio (nOPV2) (Min: 50)</option>
+                    <option value="Measles (MR) Vaccine">Measles (MR) Vaccine  (Min: 25)</option>
+                    <option value="Cold Box Ice Packs">Cold Box Ice Packs (Min: 12)</option>
+                    <option value="IV Saline Bags (500ml)">IV Saline Bags (500ml) (Min: 30)</option>
+                    <option value="Amoxicillin (Kids)">Amoxicillin (Kids) (Min: 25)</option>
+                    
+                </select>
+                <input type="number" id="qty" placeholder="Quantity">
+                <button class="btn-save" onclick="addItem()">Update Database</button>
+                <button class="btn-reset" onclick="clearData()" style="margin-top:10px;">🗑️ Clear All Records</button>
+            </div>
+
+            <div class="content-area">
+                <div class="card map-card">
+                    <h3>Regional Supply Map</h3>
+                    <div id="map"></div>
+                </div>
+
+                <div id="redistribution-panel" class="card redistribution-card" style="display:none;">
+                    <h3>🔄 Redistribution Advice</h3>
+                    <div id="transfer-advice"></div>
+                </div>
+
+                <div class="mid-section-grid">
+                    <div class="card chart-container"><h3>Status Ratio</h3><canvas id="statusDoughnut"></canvas></div>
+                    <div class="card chart-container"><h3>Inventory Levels</h3><canvas id="inventoryChart"></canvas></div>
+                </div>
+
+                <div class="card">
+                    <div class="dashboard-header">
+                        <h3>Supply Table</h3>
+                        <div class="dashboard-actions no-print">
+                            <button onclick="sendWhatsApp()" class="btn-whatsapp">📲 WhatsApp Emergency</button>
+                            <button onclick="downloadCSV()" class="btn-download">📥 Download CSV</button>
+                        </div>
+                    </div>
+                    <input type="text" id="search" placeholder="Search village..." onkeyup="renderTable()" class="no-print">
+                    <table>
+                        <thead><tr><th>Village</th><th>Item</th><th>Qty</th><th>Status</th></tr></thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="alertSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
+    <script src="script.js"></script>
+</body>
+</html>
